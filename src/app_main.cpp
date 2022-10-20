@@ -12,23 +12,13 @@ void help();
 int main(int argc, char *argv[])
 {
 
-	const char *ruleFile = nullptr;
 	const char *clientName = nullptr;
 	const char *kbdMapFile = nullptr;
-	const char *sourceName = nullptr;
 	LOG::ReportingLevel() = LogLvl::ERROR;
 
 	for (int i = 1; i < argc; i++)
 	{
-		if (strcmp(argv[i], "-i") == 0 && i + 1 < argc)
-		{
-			sourceName = argv[i + 1];
-		}
-		else if (strcmp(argv[i], "-r") == 0 && i + 1 < argc)
-		{
-			ruleFile = argv[i + 1];
-		}
-		else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc)
+		if (strcmp(argv[i], "-n") == 0 && i + 1 < argc)
 		{
 			clientName = argv[i + 1];
 		}
@@ -54,21 +44,11 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 	}
-	if (ruleFile == nullptr)
-	{
-		help();
-		return 2;
-	}
-	if (sourceName == nullptr && kbdMapFile == nullptr)
-	{
-		help();
-		return 2;
-	}
+
 	if (clientName == nullptr)
 		clientName = "mimap";
 
 	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
-	LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 	MidiClient *midiClient = nullptr;
 	MousePort *mousePort = nullptr;
 
