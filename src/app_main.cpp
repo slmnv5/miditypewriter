@@ -3,7 +3,6 @@
 #include "RuleMapper.hpp"
 #include "utils.hpp"
 #include "MidiClient.hpp"
-#include "MidiConverter.hpp"
 #include "MousePort.hpp"
 
 using namespace std;
@@ -81,10 +80,7 @@ int main(int argc, char *argv[])
 
 		mousePort = new MousePort();
 
-		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient, mousePort);
-
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
-		midiConverter.process_events();
 	}
 	catch (exception &e)
 	{
@@ -96,9 +92,6 @@ int main(int argc, char *argv[])
 void help()
 {
 	cout << "Usage: mimap5 -r <file> [options] \n"
-			"  -r <ruleFile> load file with rules, see rules.txt for details and example\n"
-			"  -i <sourceName> MIDI source to connect to\n"
-			"options:\n"
 			"  -k <kbdMapFile> use typing keyboard for MIDI notes, needs sudo\n"
 			"  -n [name] output MIDI port name to create\n"
 			"  -v verbose output\n"
