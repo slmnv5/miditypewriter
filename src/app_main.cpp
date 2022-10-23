@@ -2,7 +2,6 @@
 #include "MidiEvent.hpp"
 #include "utils.hpp"
 #include "MidiClient.hpp"
-#include "MousePort.hpp"
 
 using namespace std;
 
@@ -49,15 +48,12 @@ int main(int argc, char *argv[])
 
 	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
 	MidiClient *midiClient = nullptr;
-	MousePort *mousePort = nullptr;
 
 	try
 	{
 
 		midiClient = new MidiKbdClient(clientName, kbdMapFile);
 		LOG(LogLvl::INFO) << "Using typing keyboard as source with map: " << kbdMapFile;
-
-		mousePort = new MousePort();
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 	}

@@ -13,6 +13,4 @@
 #include <map>
 #include "log.hpp"
 
-
 #endif
-
