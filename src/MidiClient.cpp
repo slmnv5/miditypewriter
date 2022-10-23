@@ -44,24 +44,6 @@ void MidiClient::open_alsa_connection(const char *clientName, const char *source
 	subscribe(cli_id, cli_port);
 }
 
-bool MidiClient::get_input_event(MidiEvent &ev)
-{
-	snd_seq_event_t *event = nullptr;
-	int result = snd_seq_event_input(seq_handle, &event);
-	if (result < 0)
-	{
-		LOG(LogLvl::WARN) << "Possible loss of MIDI event";
-		return false;
-	}
-	if (!readMidiEvent(event, ev))
-	{
-		LOG(LogLvl::WARN) << "Unknown MIDI event send as is, type: " << event->type;
-		send_event(event);
-		return false;
-	}
-	return true;
-}
-
 void MidiClient::send_event(snd_seq_event_t *event) const
 {
 	snd_seq_ev_set_direct(event);
@@ -112,7 +94,7 @@ void MidiClient::subscribe(const int &cli_id, const int &cli_port) const
 {
 	if (snd_seq_connect_from(seq_handle, inport, cli_id, cli_port) < 0)
 	{
-		throw new MidiAppError("Cannot connect to port: " + to_string(cli_id) + ":" + to_string(cli_port));
+		throw new std::runtime_error("Cannot connect to port: " + std::to_string(cli_id) + ":" + std::to_string(cli_port));
 	}
 	LOG(LogLvl::INFO) << "Connected to source: " << cli_id << ":" << cli_port;
 }
@@ -121,63 +103,66 @@ void MidiClient::subscribe(const int &cli_id, const int &cli_port) const
 
 MidiKbdClient::MidiKbdClient(const char *clientName, const char *sourceName) : MidiClient(clientName, nullptr)
 {
-	string tmp = "/dev/input/event" + findKbdEvent();
+	std::string tmp = "/dev/input/event" + findKbdEvent();
 	fd = open(tmp.c_str(), O_RDONLY);
 	if (fd == -1)
 	{
-		throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
+		throw std::runtime_error("Cannot open typing keyboard file: " + tmp);
 	}
 	parse_file(sourceName);
 }
 
-bool MidiKbdClient::get_input_event()
+void MidiKbdClient::run()
 {
 	ssize_t n;
 	struct input_event kbd_ev;
-	n = read(fd, &kbd_ev, sizeof kbd_ev);
-	if (n == (ssize_t)-1)
+	while (true)
 	{
-		if (errno == EINTR)
+		n = read(fd, &kbd_ev, sizeof kbd_ev);
+		if (n == (ssize_t)-1)
 		{
-			return false;
+			if (errno == EINTR)
+			{
+				continue;
+			}
+			throw std::runtime_error("Error reading typing keyboard");
 		}
-		throw MidiAppError("Error reading typing keyboard", true);
+		if (n != sizeof kbd_ev)
+			continue;
+		if (kbd_ev.type != EV_KEY)
+			continue;
+
+		LOG(LogLvl::DEBUG) << "Typing keyboard: " << kbd_ev.value << " " << kbd_ev.code;
+
+		if (kbd_ev.value < 0 || kbd_ev.value > 1)
+			continue;
+		if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
+			continue;
+
+		snd_seq_event_t event;
+		snd_seq_ev_clear(&event);
+		event.type = SND_SEQ_EVENT_NOTEON;
+		event.data.note.channel = 0;
+		event.data.note.note = kbdMap.at((int)kbd_ev.code);
+		event.data.note.velocity = kbd_ev.value == 0 ? 0 : 100;
+
+		LOG(LogLvl::DEBUG) << "Send ch:note:vel: " << event.data.note.channel << ":" << event.data.note.note << ":" << event.data.note.velocity;
+
+		send_event(&event);
 	}
-	if (n != sizeof kbd_ev)
-		return false;
-	if (kbd_ev.type != EV_KEY)
-		return false;
-
-	LOG(LogLvl::DEBUG) << "Typing keyboard: " << kbd_ev.value << " " << kbd_ev.code;
-
-	if (kbd_ev.value < 0 || kbd_ev.value > 1)
-		return false;
-	if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
-		return false;
-
-	snd_seq_event_t event;
-	snd_seq_ev_clear(&event);
-	event.type = SND_SEQ_EVENT_NOTEON;
-	event.data.note.channel = 0;
-	event.data.note.note = kbdMap.at((int)kbd_ev.code);
-	event.data.note.velocity = kbd_ev.value == 0 ? 0 : 100;
-
-	LOG(LogLvl::DEBUG) << "Send ch:note:vel: " << event.data.note.channel << ":" << event.data.note.note << ":" << event.data.note.velocity;
-
-	send_event(&event);
 }
 
-void MidiKbdClient::parse_string(const string &s1)
+void MidiKbdClient::parse_string(const std::string &s1)
 {
 	std::string s(s1);
 	remove_spaces(s);
 	if (s.empty())
 		return;
 
-	vector<std::string> parts = split_string(s, "=");
+	std::vector<std::string> parts = split_string(s, "=");
 	if (parts.size() != 2)
 	{
-		throw MidiAppError("Keyboard mapping must have 2 parts: " + s, true);
+		throw std::runtime_error("Keyboard mapping must have 2 parts: " + s);
 	}
 
 	try
@@ -187,15 +172,15 @@ void MidiKbdClient::parse_string(const string &s1)
 		LOG(LogLvl::DEBUG) << "Mapping typing key code to note: " << n1 << "=" << n2;
 		kbdMap.insert({n1, n2});
 	}
-	catch (exception &e)
+	catch (std::exception &e)
 	{
-		throw MidiAppError("Keyboard mapping must have numbers on both sides of '=': " + s, true);
+		throw std::runtime_error("Keyboard mapping must have numbers on both sides of '=': " + s);
 	}
 }
 
 void MidiKbdClient::parse_file(const char *kbdMapFile)
 {
-	ifstream f(kbdMapFile);
+	std::ifstream f(kbdMapFile);
 	std::string s;
 	int k = 0;
 	while (getline(f, s))
@@ -205,11 +190,10 @@ void MidiKbdClient::parse_file(const char *kbdMapFile)
 			k++;
 			parse_string(s);
 		}
-		catch (MidiAppError &e)
+		catch (std::exception &e)
 		{
-			LogLvl level = e.is_critical() ? LogLvl::ERROR : LogLvl::WARN;
-			LOG(level) << "Line: " << k << " in " << kbdMapFile << " Error: "
-					   << e.what();
+			LOG(LogLvl::ERROR) << "Line: " << k << " in " << kbdMapFile << " Error: "
+							   << e.what();
 		}
 	}
 }
