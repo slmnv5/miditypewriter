@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (clientName == nullptr)
-		clientName = "mimap";
+		clientName = "pimidikeys";
 
 	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
 
@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
 
 		MidiKeysClient midiKeysClient(kbdMapFile, clientName, nullptr);
 		LOG(LogLvl::INFO) << "Using typing keyboard as source with map: " << kbdMapFile;
-
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
+		midiKeysClient.run();
 	}
 	catch (std::exception &e)
 	{

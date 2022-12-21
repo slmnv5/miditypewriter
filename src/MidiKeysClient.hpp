@@ -7,8 +7,8 @@
 class MidiKeysClient : public MidiClient
 {
 private:
-	std::map<int, int> kbdMap;
-	int fd;
+	std::map<int, int> mKbdMap;
+	int mFdKbd;
 
 public:
 	MidiKeysClient(const char *kbdMapFile, const char *clientName, const char *dstName);
