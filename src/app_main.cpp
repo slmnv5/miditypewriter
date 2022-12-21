@@ -3,8 +3,6 @@
 
 #include "MidiKeysClient.hpp"
 
-using namespace std;
-
 void help();
 
 int main(int argc, char *argv[])
@@ -47,7 +45,6 @@ int main(int argc, char *argv[])
 		clientName = "mimap";
 
 	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
-	MidiClient *midiClient = nullptr;
 
 	try
 	{
@@ -57,7 +54,7 @@ int main(int argc, char *argv[])
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 	}
-	catch (exception &e)
+	catch (std::exception &e)
 	{
 		LOG(LogLvl::ERROR) << "Completed with error: " << e.what();
 		return 1;
