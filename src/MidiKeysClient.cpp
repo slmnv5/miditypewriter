@@ -85,6 +85,10 @@ void MidiKeysClient::parse_string(const std::string &s1)
 void MidiKeysClient::parse_file(const char *kbdMapFile)
 {
 	std::ifstream f(kbdMapFile);
+	if (!f)
+	{
+		throw std::runtime_error("Keyboard mapping file not found: " + std::string(kbdMapFile));
+	}
 	std::string s;
 	int k = 0;
 	while (getline(f, s))
