@@ -18,7 +18,7 @@ lib: $(OBJ_APP)
 	cd $(PROJECT_ROOT)
 	@echo "build release version of shared lib"
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^  $(LDFLAGS)
-	mv -v lib pimidiclock.so
+	mv -v lib pimidikeys.so
 	
 
 app: CXXFLAGS = -std=c++11 -O2 -Wall
@@ -26,7 +26,7 @@ app: $(OBJ_APP)
 	@echo "Build release version of app"
 	cd $(PROJECT_ROOT)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^  $(LDFLAGS)
-	mv -v app pimidiclock
+	mv -v app pimidikeys
  
 $(SRC_DIR)/pch.hpp.gch: $(SRC_DIR)/pch.hpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -x c++-header -c $< -o $@

@@ -66,6 +66,7 @@ void help()
 	cout << "Usage: mimap5 -r <file> [options] \n"
 			"  -k <kbdMapFile> use typing keyboard for MIDI notes, needs sudo\n"
 			"  -n [name] output MIDI port name to create\n"
+			"  -d [dstName] name of destination MIDI port to connect\n"
 			"  -v verbose output\n"
 			"  -vv more verbose\n"
 			"  -vvv even more verbose\n"
