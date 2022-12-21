@@ -59,11 +59,11 @@ void MidiKeysClient::run()
 void MidiKeysClient::parse_string(const std::string &s1)
 {
 	std::string s(s1);
-	remove_spaces(s);
+	removeSpaces(s);
 	if (s.empty())
 		return;
 
-	std::vector<std::string> parts = split_string(s, "=");
+	std::vector<std::string> parts = splitString(s, "=");
 	if (parts.size() != 2)
 	{
 		throw std::runtime_error("Keyboard mapping must have 2 parts: " + s);

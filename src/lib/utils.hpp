@@ -6,12 +6,12 @@
 //==================== utility functions ===================================
 std::string findTouchScreenEvent();
 std::string findKbdEvent();
-std::vector<std::string> split_string(const std::string& s,
+std::vector<std::string> splitString(const std::string& s,
 	const std::string& delimiter);
-int replace_all(std::string& s, const std::string& del,
+int replaceAll(std::string& s, const std::string& del,
 	const std::string& repl);
-void remove_spaces(std::string& s);
-std::string exec_command(const std::string& cmd);
+void removeSpaces(std::string& s);
+std::string execCommand(const std::string& cmd);
 
 
 
