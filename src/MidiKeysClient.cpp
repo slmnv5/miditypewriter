@@ -1,5 +1,5 @@
 #include "MidiKeysClient.hpp"
-#include "utils.hpp"
+#include "lib/utils.hpp"
 #include "lib/log.hpp"
 
 #include <fcntl.h>

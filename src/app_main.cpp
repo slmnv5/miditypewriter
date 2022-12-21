@@ -1,5 +1,4 @@
 #include "pch.hpp"
-#include "utils.hpp"
 #include "lib/log.hpp"
 
 #include "MidiKeysClient.hpp"
