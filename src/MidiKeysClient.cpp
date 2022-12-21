@@ -25,7 +25,7 @@ void MidiKeysClient::run()
 	struct input_event kbd_ev;
 	while (true)
 	{
-		n = read(mFdKbd, &kbd_ev, sizeof kbd_ev);
+		n = read(mFdKbd, &kbd_ev, sizeof(kbd_ev));
 		if (n == (ssize_t)-1)
 		{
 			if (errno == EINTR)
