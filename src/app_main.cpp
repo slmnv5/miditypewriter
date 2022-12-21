@@ -1,6 +1,8 @@
 #include "pch.hpp"
 #include "utils.hpp"
-#include "MidiClient.hpp"
+#include "lib/log.hpp"
+
+#include "MidiKeysClient.hpp"
 
 using namespace std;
 
@@ -51,7 +53,7 @@ int main(int argc, char *argv[])
 	try
 	{
 
-		midiClient = new MidiKbdClient(clientName, kbdMapFile);
+		MidiKeysClient midiKeysClient(kbdMapFile, clientName, nullptr);
 		LOG(LogLvl::INFO) << "Using typing keyboard as source with map: " << kbdMapFile;
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";

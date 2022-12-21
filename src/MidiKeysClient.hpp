@@ -11,7 +11,7 @@ private:
 	int fd;
 
 public:
-	MidiKeysClient(const char *clientName, const char *sourceName);
+	MidiKeysClient(const char *kbdMapFile, const char *clientName, const char *dstName);
 	virtual ~MidiKeysClient()
 	{
 	}

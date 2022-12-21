@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <linux/input.h>
 
-MidiKeysClient::MidiKeysClient(const char *clientName, const char *dstName) : MidiClient(clientName, nullptr, dstName)
+MidiKeysClient::MidiKeysClient(const char *kbdMapFile, const char *clientName, const char *dstName) : MidiClient(clientName, nullptr, dstName)
 {
 	std::string tmp = "/dev/input/event" + findKbdEvent();
 	fd = open(tmp.c_str(), O_RDONLY);
@@ -13,7 +13,7 @@ MidiKeysClient::MidiKeysClient(const char *clientName, const char *dstName) : Mi
 	{
 		throw std::runtime_error("Cannot open typing keyboard file: " + tmp);
 	}
-	parse_file(sourceName);
+	parse_file(kbdMapFile);
 }
 
 void MidiKeysClient::run()
