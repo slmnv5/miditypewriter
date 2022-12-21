@@ -1,10 +1,11 @@
-#include "pch.hpp"
-#include "MidiClientKbd.hpp"
+#include "MidiKeysClient.hpp"
 #include "utils.hpp"
+#include "lib/log.hpp"
+
 #include <fcntl.h>
 #include <linux/input.h>
 
-MidiClientKbd::MidiClientKbd(const char *clientName, const char *sourceName) : MidiClient(clientName, nullptr)
+MidiKeysClient::MidiKeysClient(const char *clientName, const char *dstName) : MidiClient(clientName, nullptr, dstName)
 {
 	std::string tmp = "/dev/input/event" + findKbdEvent();
 	fd = open(tmp.c_str(), O_RDONLY);
@@ -15,7 +16,7 @@ MidiClientKbd::MidiClientKbd(const char *clientName, const char *sourceName) : M
 	parse_file(sourceName);
 }
 
-void MidiClientKbd::run()
+void MidiKeysClient::run()
 {
 	ssize_t n;
 	struct input_event kbd_ev;
@@ -55,7 +56,7 @@ void MidiClientKbd::run()
 	}
 }
 
-void MidiClientKbd::parse_string(const std::string &s1)
+void MidiKeysClient::parse_string(const std::string &s1)
 {
 	std::string s(s1);
 	remove_spaces(s);
@@ -81,7 +82,7 @@ void MidiClientKbd::parse_string(const std::string &s1)
 	}
 }
 
-void MidiClientKbd::parse_file(const char *kbdMapFile)
+void MidiKeysClient::parse_file(const char *kbdMapFile)
 {
 	std::ifstream f(kbdMapFile);
 	std::string s;
